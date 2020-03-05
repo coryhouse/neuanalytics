@@ -1,10 +1,24 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import * as userApi from "./api/userApi";
 
 function Users() {
-  const users = [
-    { id: 1, name: "Cory", role: "Admin" },
-    { id: 2, name: "Dave", role: "Quitter" }
-  ];
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    userApi.getUsers().then(usersResp => {
+      setUsers(usersResp.data);
+    });
+  }, []);
+
+  function deleteUser(id) {
+    userApi.deleteUser(id).then(() => {
+      // Alternatively, we could getUsers and then store that in state.
+      // But to avoid an extra HTTP call, we'll just remove the deleted
+      // record from state.
+      const newUsers = users.filter(user => user.id !== id);
+      setUsers(newUsers);
+    });
+  }
 
   return (
     <>
@@ -12,6 +26,7 @@ function Users() {
       <table>
         <thead>
           <tr>
+            <th></th>
             <th>ID</th>
             <th>Name</th>
             <th>Role</th>
@@ -20,6 +35,9 @@ function Users() {
         <tbody>
           {users.map(user => (
             <tr key={user.id}>
+              <td>
+                <button onClick={() => deleteUser(user.id)}>Delete</button>
+              </td>
               <td>{user.id}</td>
               <td>{user.name}</td>
               <td>{user.role}</td>
