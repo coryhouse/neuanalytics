@@ -7,22 +7,23 @@ function Users({ users, setUsers }) {
   const history = useHistory();
 
   useEffect(() => {
-    // if users aren't passed in, load 'em.
-    if (users.length === 0) {
-      userApi.getUsers().then(usersResp => {
+    async function initUsers() {
+      // if users aren't passed in, load 'em.
+      if (users.length === 0) {
+        const usersResp = await userApi.getUsers();
         setUsers(usersResp.data);
-      });
+      }
     }
+    initUsers();
   }, [setUsers, users.length]);
 
-  function deleteUser(id) {
-    userApi.deleteUser(id).then(() => {
-      // Alternatively, we could getUsers and then store that in state.
-      // But to avoid an extra HTTP call, we'll just remove the deleted
-      // record from state.
-      const newUsers = users.filter(user => user.id !== id);
-      setUsers(newUsers);
-    });
+  async function deleteUser(id) {
+    await userApi.deleteUser(id);
+    // Alternatively, we could getUsers and then store that in state.
+    // But to avoid an extra HTTP call, we'll just remove the deleted
+    // record from state.
+    const newUsers = users.filter(user => user.id !== id);
+    setUsers(newUsers);
   }
 
   return (

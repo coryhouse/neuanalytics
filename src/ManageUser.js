@@ -27,15 +27,18 @@ const ManageUser = ({ users, setUsers }) => {
       }
     }
 
-    // if users aren't passed in, load 'em.
-    if (users.length === 0) {
-      userApi.getUsers().then(usersResp => {
+    async function initUser() {
+      // if users aren't passed in, load 'em.
+      if (users.length === 0) {
+        const usersResp = await userApi.getUsers();
         setUsers(usersResp.data);
         getInitialUser(usersResp.data);
-      });
-    } else {
-      getInitialUser(users);
+      } else {
+        getInitialUser(users);
+      }
     }
+
+    initUser();
   }, [setUsers, userIdToEdit, users]);
 
   function onChange({ target }) {
