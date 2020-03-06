@@ -1,16 +1,19 @@
 import React from "react";
 import PropTypes from "prop-types";
 
-function Input(props) {
+// Supporting passing extra props via rest syntax.
+// Extra props are being assigned to the input.
+function Input({ id, label, type, value, onChange, ...additionalInputProps }) {
   return (
     <div>
-      <label htmlFor={props.id}>{props.label}</label>
+      <label htmlFor={id}>{label}</label>
       <br />
       <input
-        id={props.id}
-        type={props.type}
-        value={props.value}
-        onChange={props.onChange}
+        id={id}
+        type={type}
+        value={value}
+        onChange={onChange}
+        {...additionalInputProps}
       />
     </div>
   );

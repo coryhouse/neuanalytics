@@ -1,16 +1,19 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import * as userApi from "./api/userApi";
-import { useHistory } from "react-router-dom";
+import { useHistory, Link } from "react-router-dom";
+import PropTypes from "prop-types";
 
-function Users() {
+function Users({ users, setUsers }) {
   const history = useHistory();
-  const [users, setUsers] = useState([]);
 
   useEffect(() => {
-    userApi.getUsers().then(usersResp => {
-      setUsers(usersResp.data);
-    });
-  }, []);
+    // if users aren't passed in, load 'em.
+    if (users.length === 0) {
+      userApi.getUsers().then(usersResp => {
+        setUsers(usersResp.data);
+      });
+    }
+  }, [setUsers, users.length]);
 
   function deleteUser(id) {
     userApi.deleteUser(id).then(() => {
@@ -47,7 +50,9 @@ function Users() {
                 </button>
               </td>
               <td>{user.id}</td>
-              <td>{user.name}</td>
+              <td>
+                <Link to={"/user/" + user.id}>{user.name}</Link>
+              </td>
               <td>{user.role}</td>
             </tr>
           ))}
@@ -56,5 +61,10 @@ function Users() {
     </>
   );
 }
+
+Users.propTypes = {
+  users: PropTypes.array.isRequired,
+  setUsers: PropTypes.func.isRequired
+};
 
 export default Users;
