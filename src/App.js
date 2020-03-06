@@ -4,6 +4,7 @@ import Users from "./Users";
 import Home from "./Home";
 import PageNotFound from "./PageNotFound";
 import { Route, Switch } from "react-router-dom";
+import ManageUser from "./ManageUser";
 
 function App() {
   return (
@@ -15,6 +16,9 @@ function App() {
         </Route>
         <Route path="/users">
           <Users />
+        </Route>
+        <Route path="/user">
+          <ManageUser />
         </Route>
         <Route>
           <PageNotFound />

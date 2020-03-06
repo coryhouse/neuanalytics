@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import * as userApi from "./api/userApi";
+import { useHistory } from "react-router-dom";
 
 function Users() {
+  const history = useHistory();
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
@@ -23,6 +25,7 @@ function Users() {
   return (
     <>
       <h1>Users</h1>
+      <button onClick={() => history.push("/user")}>Add User</button>
       <table>
         <thead>
           <tr>
@@ -36,7 +39,12 @@ function Users() {
           {users.map(user => (
             <tr key={user.id}>
               <td>
-                <button onClick={() => deleteUser(user.id)}>Delete</button>
+                <button
+                  aria-label={`Delete ${user.name} with ID of ${user.id}`}
+                  onClick={() => deleteUser(user.id)}
+                >
+                  Delete
+                </button>
               </td>
               <td>{user.id}</td>
               <td>{user.name}</td>

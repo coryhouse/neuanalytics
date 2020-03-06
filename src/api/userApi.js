@@ -9,3 +9,7 @@ export function getUsers() {
 export function deleteUser(userId) {
   return axios.delete(baseUrl + userId);
 }
+
+export function addUser(user) {
+  return axios.post(baseUrl, user);
+}
