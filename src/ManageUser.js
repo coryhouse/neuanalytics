@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import * as userApi from "./api/userApi";
 import { useHistory } from "react-router-dom";
+import Input from "./shared/Input";
 
 const ManageUser = () => {
   const history = useHistory();
@@ -26,16 +27,8 @@ const ManageUser = () => {
   return (
     <form onSubmit={addUser}>
       <h1>Add User</h1>
-      <div>
-        <label htmlFor="name">Name</label>
-        <br />
-        <input id="name" type="text" value={user.name} onChange={onChange} />
-      </div>
-      <div>
-        <label htmlFor="role">Role</label>
-        <br />
-        <input id="role" type="text" value={user.role} onChange={onChange} />
-      </div>
+      <Input id="name" label="Name" value={user.name} onChange={onChange} />
+      <Input id="role" label="Role" value={user.role} onChange={onChange} />
       <input type="submit" value="Add User" />
     </form>
   );
