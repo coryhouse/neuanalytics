@@ -10,6 +10,8 @@ export async function deleteUser(userId) {
   return axios.delete(baseUrl + userId);
 }
 
-export async function addUser(user) {
-  return axios.post(baseUrl, user);
+export async function saveUser(user) {
+  return user.id
+    ? axios.put(baseUrl + user.id, user)
+    : axios.post(baseUrl, user);
 }

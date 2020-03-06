@@ -10,12 +10,19 @@ const emptyUser = {
   role: ""
 };
 
+const STATUS = {
+  LOADING: "LOADING",
+  SAVING: "SAVING",
+  IDLE: "IDLE"
+};
+
 const ManageUser = ({ users, setUsers }) => {
   const history = useHistory();
   const match = useRouteMatch();
   const { id: userIdToEdit } = match.params;
   const inEditMode = Boolean(userIdToEdit);
   const [user, setUser] = useState(emptyUser);
+  const [status, setStatus] = useState(STATUS.IDLE);
 
   useEffect(() => {
     function getInitialUser(users) {
@@ -30,9 +37,17 @@ const ManageUser = ({ users, setUsers }) => {
     async function initUser() {
       // if users aren't passed in, load 'em.
       if (users.length === 0) {
-        const usersResp = await userApi.getUsers();
-        setUsers(usersResp.data);
-        getInitialUser(usersResp.data);
+        try {
+          setStatus(STATUS.LOADING);
+          const usersResp = await userApi.getUsers();
+          setUsers(usersResp.data);
+          getInitialUser(usersResp.data);
+        } catch (error) {
+          console.error(error);
+          throw error;
+        } finally {
+          setStatus(STATUS.IDLE);
+        }
       } else {
         getInitialUser(users);
       }
@@ -46,21 +61,53 @@ const ManageUser = ({ users, setUsers }) => {
     setUser({ ...user, [target.id]: target.value });
   }
 
-  function addUser(event) {
+  async function saveUser(event) {
     event.preventDefault(); // don't post back.
-    userApi.addUser(user).then(response => {
-      setUsers([...users, response.data]);
+    try {
+      setStatus(STATUS.SAVING);
+      const { data: savedUser } = await userApi.saveUser(user);
+
+      if (inEditMode) {
+        // Replace saved user using map
+        setUsers(users.map(u => (u.id === savedUser.id ? savedUser : u)));
+      } else {
+        setUsers([...users, savedUser]);
+      }
       // redirect to /users
       history.push("/users");
-    });
+    } catch (error) {
+      alert("Oops! Save failed. Please check your network and try again.");
+      console.error(error);
+      throw error;
+    } finally {
+      setStatus(STATUS.IDLE);
+    }
   }
 
+  if (status === STATUS.LOADING) return <h1>Loading... 🦄</h1>;
+
   return (
-    <form onSubmit={addUser}>
+    <form onSubmit={saveUser}>
       <h1>{inEditMode ? "Edit" : "Add"} User</h1>
-      <Input id="name" label="Name" value={user.name} onChange={onChange} />
-      <Input id="role" label="Role" value={user.role} onChange={onChange} />
-      <input type="submit" value={inEditMode ? "Save User" : "Add User"} />
+      <Input
+        id="name"
+        disabled={status === STATUS.SAVING}
+        label="Name"
+        value={user.name}
+        onChange={onChange}
+      />
+      <Input
+        id="role"
+        disabled={status === STATUS.SAVING}
+        label="Role"
+        value={user.role}
+        onChange={onChange}
+      />
+      <input
+        type="submit"
+        disabled={status === STATUS.SAVING}
+        value={inEditMode ? "Save User" : "Add User"}
+      />
     </form>
   );
 };
